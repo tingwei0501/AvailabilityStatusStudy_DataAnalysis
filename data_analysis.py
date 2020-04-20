@@ -19,35 +19,96 @@ import csv
 # text_keep_highly_unavailable location = {"家裡": 5}
 #                              activity = {"工作": 4} 
 
-class text_keep_highly_unavailable:
+class text_highly_available: #系統給出 文字顯示 高度有空
     def __init__(self):
-        self.location = {}
-        self.activity = {}
-        self.company = {}
+        self.keep_highly_available_location = {}
+        self.keep_highly_available_activity = {}
+        self.keep_highly_available_company = {}
+
+        self.middle_available_location = {}
+        self.middle_available_activity = {}
+        self.middle_available_company = {}
+
+        self.unavailable_location = {}
+        self.unavailable_activity = {}
+        self.unavailable_company = {}
+
+        self.using_digit_high_responseRate = {} # >=70%
+        self.using_digit_middleHigh_responseRate = {} # 50%<= x <70%
+        self.using_digit_middleLow_responseRate = {} # 30%<= x <50%
+        self.using_digit_low_responseRate = {} # <30%
+        self.using_digit_low_interruptibility = {} # 干擾率<=30%
+        self.using_digit_middleLow_interruptibility = {} # 干擾率 30%< x <=50%
+        self.using_digit_middleHigh_interruptibility = {} # 干擾率 50%< x <=70%
+        self.using_digit_high_interruptibility = {} # 干擾率 >70%
+
+        self.using_graphic_high_responseRate = {} # >=70%
+        self.using_graphic_middleHigh_responseRate = {} # 50%<= x <70%
+        self.using_graphic_middleLow_responseRate = {} # 30%<= x <50%
+        self.using_graphic_low_responseRate = {} # <30%
+        self.using_graphic_low_interruptibility = {} # 干擾率<=30%
+        self.using_graphic_middleLow_interruptibility = {} # 干擾率 30%< x <=50%
+        self.using_graphic_middleHigh_interruptibility = {} # 干擾率 50%< x <=70%
+        self.using_graphic_high_interruptibility = {} # 干擾率 >70%
+
+class text_middle_available: #系統給出 文字顯示 中度有空
+    def __init__(self):
+        self.keep_middle_available_location = {}
+        self.keep_middle_available_activity = {}
+        self.keep_middle_available_company = {}
+
+class text_middle_unavailable: #系統給出 文字顯示 中度沒空
+    def __init__(self):
+        self.keep_middle_unavailable_location = {}
+        self.keep_middle_unavailable_activity = {}
+        self.keep_middle_unavailable_company = {}
+
+class text_highly_unavailable: #系統給出 文字顯示 高度沒空
+    def __init__(self):
+        self.keep_highly_unavailable_location = {}
+        self.keep_highly_unavailable_activity = {}
+        self.keep_highly_unavailable_company = {}
 
 with open('analysis data(python).csv', newline='') as csvfile:
     rows = csv.DictReader(csvfile)
     tkhu = text_keep_highly_unavailable()
     high_unavailable_text_count = 0
+    tkha = text_keep_highly_available()
+    high_available_text_count = 0
+
     for row in rows:
         # 保持文字顯示
         if row['idealShowDifferent']=='FALSE' and row['presentWay']=='text':
             # 保持高度沒空
             if (row['statusText']=='回覆率低' or row['statusText']=='目前不會回覆' or row['statusText']=='目前不會看訊息'):
                 if row['changeStatusOrNot']=='notChange':
-                    high_unavailable_text_count+=1  # 24
+                    high_unavailable_text_count += 1  # 24
                     if row['selectedLocation'] not in tkhu.location:
                         tkhu.location.setdefault(row['selectedLocation'], 1)
                     else:
-                        tkhu.location[row['selectedLocation']]+=1
+                        tkhu.location[row['selectedLocation']] += 1
                 elif row['changeStatusOrNot']=='change' and row['idealStatusWay']=='文字顯示' and (row['idealStatusString']=='回覆率低' or row['idealStatusString']=='目前不會回覆' or row['idealStatusString']=='目前不會看訊息' or row['idealStatusString']=='忙碌中' or row['idealStatusString']=='開會中' or row['idealStatusString']=='請勿打擾'):
-                    high_unavailable_text_count+=1 
+                    high_unavailable_text_count += 1 
                     if row['selectedLocation'] not in tkhu.location:
                         tkhu.location.setdefault(row['selectedLocation'], 1)
                     else:
                         tkhu.location[row['selectedLocation']]+=1
             # 保持高度有空
-            elif (row['statusText']=='')
-            
+            elif (row['statusText']=='目前會回覆' or row['statusText']=='回覆率高'):
+                if row['changeStatusOrNot']=='notChange':
+                    high_available_text_count += 1
+                    if row['selectedLocation'] not in tkha.location:
+                        tkha.location.setdefault(row['selectedLocation'], 1)
+                    else:
+                        tkha.location[row['selectedLocation']] += 1
+                elif row['changeStatusOrNot']=='change' and row['idealStatusWay']=='文字顯示' and (row['idealStatusString']=='回覆率高' or row['idealStatusString']=='目前會回覆' or row['idealStatusString']=='上線中' or row['idealStatusString']=='有空' or row['idealStatusString']=='歡迎打擾'):
+                    high_available_text_count += 1
+                    if row['selectedLocation'] not in tkha.location:
+                        tkha.location.setdefault(row['selectedLocation'], 1)
+                    else:
+                        tkha.location[row['selectedLocation']] += 1
+
+    print ("high_available_text_count: ", high_available_text_count)
+    print ("text_keep_highly_available: ", tkha.location)        
     print ("high_unavailable_text_count: ", high_unavailable_text_count)
     print ("text_keep_highly_unavailable: ", tkhu.location)
