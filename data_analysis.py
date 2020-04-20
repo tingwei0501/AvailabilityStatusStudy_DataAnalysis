@@ -69,46 +69,76 @@ class text_highly_unavailable: #系統給出 文字顯示 高度沒空
         self.keep_highly_unavailable_activity = {}
         self.keep_highly_unavailable_company = {}
 
+def saveLocation(row, myDict):
+    if row['selectedLocation'] not in myDict:
+        myDict.setdefault(row['selectedLocation'], 1)
+    else:
+        myDict[row['selectedLocation']] += 1
+
 with open('analysis data(python).csv', newline='') as csvfile:
     rows = csv.DictReader(csvfile)
-    tkhu = text_keep_highly_unavailable()
-    high_unavailable_text_count = 0
-    tkha = text_keep_highly_available()
-    high_available_text_count = 0
+    thu = text_highly_unavailable()
+    text_keep_highly_unavailable_count = 0
+
+    tha = text_highly_available()
+    text_keep_highly_available_count = 0
+    text_middle_available = 0
+    text_unavailable = 0
+    text_digit_high_responseRate = 0
+    text_digit_middleHigh_responseRate = 0
 
     for row in rows:
-        # 保持文字顯示
+        # 系統文字顯示
         if row['idealShowDifferent']=='FALSE' and row['presentWay']=='text':
-            # 保持高度沒空
+            # 系統呈現高度沒空
             if (row['statusText']=='回覆率低' or row['statusText']=='目前不會回覆' or row['statusText']=='目前不會看訊息'):
                 if row['changeStatusOrNot']=='notChange':
-                    high_unavailable_text_count += 1  # 24
-                    if row['selectedLocation'] not in tkhu.location:
-                        tkhu.location.setdefault(row['selectedLocation'], 1)
-                    else:
-                        tkhu.location[row['selectedLocation']] += 1
-                elif row['changeStatusOrNot']=='change' and row['idealStatusWay']=='文字顯示' and (row['idealStatusString']=='回覆率低' or row['idealStatusString']=='目前不會回覆' or row['idealStatusString']=='目前不會看訊息' or row['idealStatusString']=='忙碌中' or row['idealStatusString']=='開會中' or row['idealStatusString']=='請勿打擾'):
-                    high_unavailable_text_count += 1 
-                    if row['selectedLocation'] not in tkhu.location:
-                        tkhu.location.setdefault(row['selectedLocation'], 1)
-                    else:
-                        tkhu.location[row['selectedLocation']]+=1
-            # 保持高度有空
-            elif (row['statusText']=='目前會回覆' or row['statusText']=='回覆率高'):
+                    text_keep_highly_unavailable_count += 1  # 24
+                    saveLocation(row, thu.keep_highly_unavailable_location)
+                else: # change
+                    if row['idealStatusWay']=='文字顯示' and (row['idealStatusString']=='回覆率低' or row['idealStatusString']=='目前不會回覆' or row['idealStatusString']=='目前不會看訊息' or row['idealStatusString']=='忙碌中' or row['idealStatusString']=='開會中' or row['idealStatusString']=='請勿打擾'):
+                        text_keep_highly_unavailable_count += 1 
+                        saveLocation(row, thu.keep_highly_unavailable_location)
+            # 系統呈現高度有空
+            elif row['statusText']=='目前會回覆' or row['statusText']=='回覆率高':
                 if row['changeStatusOrNot']=='notChange':
-                    high_available_text_count += 1
-                    if row['selectedLocation'] not in tkha.location:
-                        tkha.location.setdefault(row['selectedLocation'], 1)
-                    else:
-                        tkha.location[row['selectedLocation']] += 1
-                elif row['changeStatusOrNot']=='change' and row['idealStatusWay']=='文字顯示' and (row['idealStatusString']=='回覆率高' or row['idealStatusString']=='目前會回覆' or row['idealStatusString']=='上線中' or row['idealStatusString']=='有空' or row['idealStatusString']=='歡迎打擾'):
-                    high_available_text_count += 1
-                    if row['selectedLocation'] not in tkha.location:
-                        tkha.location.setdefault(row['selectedLocation'], 1)
-                    else:
-                        tkha.location[row['selectedLocation']] += 1
+                    text_keep_highly_available_count += 1
+                    saveLocation(row, tha.keep_highly_available_location)
+                else: # change
+                    if row['idealStatusWay']=='文字顯示':
+                        # 保持文字高度有空
+                        if row['idealStatusString']=='回覆率高' or row['idealStatusString']=='目前會回覆' or row['idealStatusString']=='上線中' or row['idealStatusString']=='有空' or row['idealStatusString']=='歡迎打擾':
+                            text_keep_highly_available_count += 1
+                            saveLocation(row, tha.keep_highly_available_location)
+                        # 改為文字中度有空
+                        elif row['idealStatusString']=='回覆率中等' or row['idealStatusString']=='有可能會回覆' or row['idealStatusString']=='可能會看訊息':
+                            text_middle_available += 1
+                            saveLocation(row, tha.middle_available_location)
+                        # 改為文字沒空
+                        elif row['idealStatusString']=='可能不會回覆' or row['idealStatusString']=='回覆率低' or row['idealStatusString']=='目前不會回覆' or row['idealStatusString']=='目前不會看訊息' or row['idealStatusString']=='忙碌中' or row['idealStatusString']=='開會中' or row['idealStatusString']=='請勿打擾':
+                            text_unavailable += 1
+                            saveLocation(row, tha.unavailable_location)
+                    elif row['idealStatusWay']=='數字顯示':
+                        if row['idealStatusForm']=='回覆率' or row['idealStatusForm']=='讀訊息率':
+                            #ideal_minus_system = row['idealStatusRate'] - row['status']
+                            #if ideal_minus_system
+                            if int(row['idealStatusRate']) >= 70:
+                                text_digit_high_responseRate += 1
+                                saveLocation(row, tha.using_digit_high_responseRate)
+                            elif int(row['idealStatusRate']) >=50:
+                                text_digit_middleHigh_responseRate += 1
+                                saveLocation(row, tha.using_digit_middleHigh_responseRate)
+                                
 
-    print ("high_available_text_count: ", high_available_text_count)
-    print ("text_keep_highly_available: ", tkha.location)        
-    print ("high_unavailable_text_count: ", high_unavailable_text_count)
-    print ("text_keep_highly_unavailable: ", tkhu.location)
+
+    print ("text_keep_highly_available_count: ", text_keep_highly_available_count)
+    print ("text_keep_highly_available_location: ", tha.keep_highly_available_location) 
+    print ("text_middle_available: ", text_middle_available)
+    print ("text_middle_available_location: ", tha.middle_available_location)
+    print ("text_unavailable: ", text_unavailable)
+    print ("text_unavailable_location: ", tha.unavailable_location)
+    print ("text_digit_high_responseRate: ", text_digit_high_responseRate)
+    print ("text_digit_middleHigh_responseRate: ", text_digit_middleHigh_responseRate)
+
+    print ("text_keep_highly_unavailable_count: ", text_keep_highly_unavailable_count)
+    print ("text_keep_highly_unavailable: ", thu.keep_highly_unavailable_location)
