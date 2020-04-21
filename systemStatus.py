@@ -87,4 +87,4 @@ class text_highly_unavailable: #系統給出 文字顯示 高度沒空
         self.highly_unavailable_activity = {}
         self.highly_unavailable_company = {}
 
-class digit_highly_available:
+# class digit_highly_available:
