@@ -1,5 +1,6 @@
 import csv
 import systemStatus
+import Manager
 
 ### 系統提供文字顯示
 # 高度有空: 目前會回覆 / 回覆率高
@@ -33,17 +34,18 @@ def saveData(context, row, myDict):
 
 with open('analysis data(python).csv', newline='') as csvfile:
     rows = csv.DictReader(csvfile)
-    thu = systemStatus.text_highly_unavailable()
-    text_highly_unavailable_count = 0
+    # thu = systemStatus.text_highly_unavailable()
+    # text_highly_unavailable_count = 0
 
-    tha = systemStatus.text_highly_available()
-    tma = systemStatus.text_middle_available()
+    # tha = systemStatus.text_highly_available()
+    # tma = systemStatus.text_middle_available()
+    Manager manager(rows)
 
     for row in rows:
         # 系統文字顯示
         if row['idealShowDifferent']=='FALSE' and row['presentWay']=='text':
             # 系統呈現高度有空
-            elif row['statusText']=='目前會回覆' or row['statusText']=='回覆率高':
+            if row['statusText']=='目前會回覆' or row['statusText']=='回覆率高':
                 if row['changeStatusOrNot']=='notChange':
                     tha.highly_available_count += 1
                     saveData(location, row, tha.highly_available_location)
@@ -109,7 +111,7 @@ with open('analysis data(python).csv', newline='') as csvfile:
                         # 改為沒空
             # 系統呈現中度沒空
             # 系統呈現高度沒空
-            if (row['statusText']=='回覆率低' or row['statusText']=='目前不會回覆' or row['statusText']=='目前不會看訊息'):
+            elif (row['statusText']=='回覆率低' or row['statusText']=='目前不會回覆' or row['statusText']=='目前不會看訊息'):
                 if row['changeStatusOrNot']=='notChange':
                     text_highly_unavailable_count += 1  # 24
                     saveData(location, row, thu.highly_unavailable_location)
