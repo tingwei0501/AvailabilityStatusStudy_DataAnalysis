@@ -20,9 +20,7 @@ from Manager import Manager
 # Activity: 工作/"讀書/寫作業"/"上課/開會"/吃飯/睡覺/運動/上廁所/洗澡/玩遊戲/"看電視/看影片"/用電腦/聊天/滑手機(消磨時間)/移動中(交通工具)/移動中(開車)/移動中(走路)/逛街/購物
 # text_highly_unavailable location = {"家裡": 5}
 #                              
-location = "selectedLocation"
-activity = "selectedActivity"
-company = "selectedWhom"
+
 
 #TODO: 需handle "其他"
 def saveData(context, row, myDict):
@@ -83,34 +81,63 @@ with open('analysis data(python).csv', newline='') as csvfile:
     text_highly_available_2_graphic_middle_unavailable = 0
     text_highly_available_2_graphic_highly_unavailable = 0
 
+    system = []
+    systemType = ["text", "digit", "graphic"]
+    systemStatus = ["HighlyAvailable", "MiddleAvailable", "MiddleUnavailable", "HighlyUnavailable"]
     
-    for data in manager.dataTable:
-        if data.getSystemStatus()=='text_HighlyAvailable':
-            if data.getSelfReportStatus()=='text_HighlyAvailable':
-                # 存情境資料??
-                text_keep_highly_available += 1
-            elif data.getSelfReportStatus()=='text_MiddleAvailable':
-                text_highly_available_2_middle_available += 1
-            elif data.getSelfReportStatus()=='text_MiddleUnavailable' or data.getSelfReportStatus()=='text_HighlyUnavailable':
-                text_highly_available_2_unavailable += 1
-            # 改用數字
-            elif data.getSelfReportStatus()=='digit_HighlyAvailable':
-                text_highly_available_2_digit_highly_available += 1
-            elif data.getSelfReportStatus()=='digit_MiddleAvailable':
-                text_highly_available_2_digit_middle_available += 1
-            elif data.getSelfReportStatus()=='digit_MiddleUnavailable':
-                text_highly_available_2_digit_middle_unavailable += 1
-            elif data.getSelfReportStatus()=='digit_HighlyUnavailable':
-                text_highly_available_2_digit_highly_unavailable += 1
-            # 改用圖像
-            elif data.getSelfReportStatus()=='graphic_HighlyAvailable':
-                text_highly_available_2_graphic_highly_available += 1
-            elif data.getSelfReportStatus()=='graphic_MiddleAvailable':
-                text_highly_available_2_graphic_middle_available += 1
-            elif data.getSelfReportStatus()=='graphic_MiddleUnavailable':
-                text_highly_available_2_graphic_middle_unavailable += 1
-            elif data.getSelfReportStatus()=='graphic_HighlyUnavailable':
-                text_highly_available_2_graphic_highly_unavailable += 1
+    
+    # print (len(manager.getListSystemStatus("HighlyAvailable")))
+
+    # result = list(set(manager.getListSystemType("text")) & set(manager.getListSystemStatus("HighlyAvailable")))
+    # print (len(result))
+    for t in systemType:
+        for s in systemStatus:
+            result = list(set(manager.getListSystemType(t)) & set(manager.getListSystemStatus(s)))
+            # print (len(result))
+            system.append(result)
+    
+    selfReport = []
+    selfReportType = ["文字顯示", "數字顯示", "圖像顯示"]
+    selfReportStatus = ["HighlyAvailable", "MiddleAvailable", "MiddleUnavailable", "HighlyUnavailable"]
+    for t in selfReportType:
+        for s in selfReportStatus:
+            result = list(set(manager.getListSelfReportType(t)) & set(manager.getListSelfReportStatus(s)))
+            selfReport.append(result)
+    
+    for s in system:
+        for u in selfReport:
+            result = list(set(s) & set(u))
+            print (len(result))
+    
+
+
+    # for data in manager.dataTable:
+    #     if data.getSystemStatus()=='text_HighlyAvailable':
+    #         if data.getSelfReportStatus()=='text_HighlyAvailable':
+    #             # 存情境資料??
+    #             text_keep_highly_available += 1
+    #         elif data.getSelfReportStatus()=='text_MiddleAvailable':
+    #             text_highly_available_2_middle_available += 1
+    #         elif data.getSelfReportStatus()=='text_MiddleUnavailable' or data.getSelfReportStatus()=='text_HighlyUnavailable':
+    #             text_highly_available_2_unavailable += 1
+    #         # 改用數字
+    #         elif data.getSelfReportStatus()=='digit_HighlyAvailable':
+    #             text_highly_available_2_digit_highly_available += 1
+    #         elif data.getSelfReportStatus()=='digit_MiddleAvailable':
+    #             text_highly_available_2_digit_middle_available += 1
+    #         elif data.getSelfReportStatus()=='digit_MiddleUnavailable':
+    #             text_highly_available_2_digit_middle_unavailable += 1
+    #         elif data.getSelfReportStatus()=='digit_HighlyUnavailable':
+    #             text_highly_available_2_digit_highly_unavailable += 1
+    #         # 改用圖像
+    #         elif data.getSelfReportStatus()=='graphic_HighlyAvailable':
+    #             text_highly_available_2_graphic_highly_available += 1
+    #         elif data.getSelfReportStatus()=='graphic_MiddleAvailable':
+    #             text_highly_available_2_graphic_middle_available += 1
+    #         elif data.getSelfReportStatus()=='graphic_MiddleUnavailable':
+    #             text_highly_available_2_graphic_middle_unavailable += 1
+    #         elif data.getSelfReportStatus()=='graphic_HighlyUnavailable':
+    #             text_highly_available_2_graphic_highly_unavailable += 1
         
             # if data.getSystemStatus()=='text_HighlyAvailable':
             #     system_text_highly_available.append(data)
@@ -178,19 +205,19 @@ with open('analysis data(python).csv', newline='') as csvfile:
     # for i in text_keep_highly_available_list:
     #     print (i)
 
-    print ("text_keep_highly_available: ", text_keep_highly_available)
-    print ("text_highly_available_2_middle_available: ", text_highly_available_2_middle_available)
-    print ("text_highly_available_2_unavailable: ", text_highly_available_2_unavailable)
+    # print ("text_keep_highly_available: ", text_keep_highly_available)
+    # print ("text_highly_available_2_middle_available: ", text_highly_available_2_middle_available)
+    # print ("text_highly_available_2_unavailable: ", text_highly_available_2_unavailable)
 
-    print ("text_highly_available_2_digit_highly_available: ", text_highly_available_2_digit_highly_available)
-    print ("text_highly_available_2_digit_middle_available: ", text_highly_available_2_digit_middle_available)
-    print ("text_highly_available_2_digit_middle_unavailable: ", text_highly_available_2_digit_middle_unavailable)
-    print ("text_highly_available_2_digit_highly_unavailable: ", text_highly_available_2_digit_highly_unavailable)
+    # print ("text_highly_available_2_digit_highly_available: ", text_highly_available_2_digit_highly_available)
+    # print ("text_highly_available_2_digit_middle_available: ", text_highly_available_2_digit_middle_available)
+    # print ("text_highly_available_2_digit_middle_unavailable: ", text_highly_available_2_digit_middle_unavailable)
+    # print ("text_highly_available_2_digit_highly_unavailable: ", text_highly_available_2_digit_highly_unavailable)
 
-    print ("text_highly_available_2_graphic_highly_available: ", text_highly_available_2_graphic_highly_available)
-    print ("text_highly_available_2_graphic_middle_available: ", text_highly_available_2_graphic_middle_available)
-    print ("text_highly_available_2_graphic_middle_unavailable: ", text_highly_available_2_graphic_middle_unavailable)
-    print ("text_highly_available_2_graphic_highly_unavailable: ", text_highly_available_2_graphic_highly_unavailable)
+    # print ("text_highly_available_2_graphic_highly_available: ", text_highly_available_2_graphic_highly_available)
+    # print ("text_highly_available_2_graphic_middle_available: ", text_highly_available_2_graphic_middle_available)
+    # print ("text_highly_available_2_graphic_middle_unavailable: ", text_highly_available_2_graphic_middle_unavailable)
+    # print ("text_highly_available_2_graphic_highly_unavailable: ", text_highly_available_2_graphic_highly_unavailable)
 
 
 
